@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 type MemberAvatarProps = {
   name: string;
-  imageUrl?: string | null;
+  imageUrl?: string | null | undefined;
   className?: string;
 };
 

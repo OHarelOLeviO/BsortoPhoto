@@ -102,17 +102,28 @@ export async function fetchProfile(userId: string): Promise<{ member: Member; po
 }
 
 /** Exchange storage paths for signed URLs the <img> tags can render. */
-export async function signImagePaths(paths: (string | null | undefined)[]): Promise<Record<string, string>> {
+export async function signImagePaths(
+  paths: (string | null | undefined)[],
+): Promise<Record<string, string>> {
   const unique = [...new Set(paths.filter((p): p is string => Boolean(p)))];
   if (unique.length === 0) return {};
 
-  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrls(unique, SIGNED_URL_TTL_SECONDS);
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrls(unique, SIGNED_URL_TTL_SECONDS);
+
   if (error) throw error;
 
   const map: Record<string, string> = {};
+
   data?.forEach((entry, index) => {
-    if (entry.signedUrl) map[unique[index]] = entry.signedUrl;
+    const path = unique[index];
+
+    if (path && entry.signedUrl) {
+      map[path] = entry.signedUrl;
+    }
   });
+
   return map;
 }
 
